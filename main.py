@@ -2,27 +2,27 @@ from classification.data_generator import generateLinearData
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from classification.models.perceptron import Perceptron
+from plotting import plotBinaryPoints, plotLine
 
-generateLinearData('data', True)
+generateLinearData('data', True, n_samples=10)
 
 df = pd.read_csv('data.csv')
 
-X = df[['x1', 'x2']]
-y = df['y']
+X = df[['x1', 'x2']].to_numpy()
+y = df['y'].to_numpy()
 
-x_pos = []
-x_neg = []
+plotBinaryPoints(X, y)
 
-for i in range(y.shape[0]):
-    if int(y[i]) == 1:
-        x_pos.append(X.iloc[i])
-    else:
-        x_neg.append(X.iloc[i])
+model = Perceptron()
 
-x_neg = np.array([[x['x1'], x['x2']] for x in x_neg])
-x_pos = np.array([[x['x1'], x['x2']] for x in x_pos])
+model.fit(X, y, 100000)
 
-plt.scatter(x_pos[:,0], x_pos[:,1], color='b')
-plt.scatter(x_neg[:,0], x_neg[:,1], color='r')
+xRange = np.array([min(X[0]) - 1, max(X[0]) + 1])
+
+plotLine(model.theta, np.array([0, model.theta_0]), xRange)
+
+print(model.theta)
+print(model.theta_0)
 
 plt.show()

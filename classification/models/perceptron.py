@@ -18,17 +18,20 @@ class Perceptron:
             None: it updates the class fields
         """
         # dimension of theta should be equal to the dimension of feature vectors in X
-        self.theta = np.zeros(X_train.size[1])
+        self.theta = np.zeros(X_train.shape[1])
         self.theta_0 = 0
 
         n = X_train.shape[0] # Number of datapoints
 
+        y = np.where(y_train > 0, 1, 0)
+
         for t in range(T):
             for i in range(n):
                 # the condition below is satisfied iff the prediction of the current perceptron state and the actual value mismatch
-                if y_train[i] * (np.dot(self.theta, X_train[i]) + self.theta_0) <= 0:
-                    self.theta += y_train[i]*X_train[i]
-                    self.theta_0 += y_train[i]
+                yp = self.predict(X_train[i])
+                update = 0.1 * (y[i] - yp)
+                self.theta += update * X_train[i]
+                self.theta_0 += update
 
     def predict(self, x: np.array) -> int:
         """
@@ -40,4 +43,4 @@ class Perceptron:
         Returns:
             y (int): either 1 or -1 for binary classification problem
         """
-        return 1 if np.dot(self.theta, x) + self.theta_0 > 0 else -1
+        return 1 if np.dot(self.theta, x) + self.theta_0 > 0 else 0
