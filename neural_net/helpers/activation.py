@@ -13,3 +13,7 @@ def sigmoid(z: np.float64) -> np.float64:
 
 def tanh(z: np.float64) -> np.float64:
     return (e**z - e**(-z)) / (e**z + e**(-z))
+
+def softmax(z: np.array) -> np.array:
+    r = np.array([e**z_i for z_i in z])
+    return r / np.sum(r)
