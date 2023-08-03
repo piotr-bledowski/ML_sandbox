@@ -1,4 +1,4 @@
-# ML_sandbox
+# ML sandbox
 A place for me to play around with ML models made from scratch
 
 # Neural Net
