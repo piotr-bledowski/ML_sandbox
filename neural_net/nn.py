@@ -1,6 +1,8 @@
 from helpers.activation import *  # already imports numpy as np
+from helpers.cost import MSE
 from typing import Callable, Any
 import random
+import math
 
 
 class Neuron:
@@ -10,7 +12,7 @@ class Neuron:
         self.activation = activation
 
     def __call__(self, x: np.array) -> np.float64:
-        return self.activation(np.dot(self.weights, x) + self.bias)
+        return self.activation(np.dot(self.weights.T, x) + self.bias)
 
     def update(self, w: np.array[np.float64], b: np.float64):
         self.weights = w
