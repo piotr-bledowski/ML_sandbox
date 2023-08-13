@@ -46,6 +46,27 @@ class FullyConnectedLayer(Layer):
         """
         return np.dot(x, self.weights) + self.bias
 
+    def backward_pass(self, output_error: np.float64, learning_rate: np.float64):
+        """
+        Computes dL/dZ_l given dL/dA_l as per MIT OCW 6.036 notation
+
+        Parameters:
+            output_error (np.float64): output error calculated by the following layer
+            learning_rate (np.float64)
+
+        Returns:
+            input_error (np.float64): output error of the previous layer
+        """
+        input_error = np.dot(output_error, self.weights.T)
+        weights_error = np.dot(self.input.T, output_error)
+
+        # Bias error is the same as output error
+
+        self.weights -= learning_rate * weights_error
+        self.bias -= learning_rate * output_error
+
+        return input_error
+
 
 class ActivationLayer(Layer):
     pass
