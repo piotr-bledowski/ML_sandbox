@@ -1,7 +1,6 @@
 from helpers.activation import *  # already imports numpy as np
 from helpers.cost import MSE
 from layer import *
-from typing import Callable, Any
 import random
 
 

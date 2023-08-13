@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Callable, Any
 
 
 class Layer:
@@ -44,11 +45,13 @@ class FullyConnectedLayer(Layer):
         Returns:
             z (np.array[np.float64]): layer's output
         """
-        return np.dot(x, self.weights) + self.bias
+        self.input = x
+        self.output = np.dot(x, self.weights) + self.bias
+        return self.output
 
     def backward_pass(self, output_error: np.float64, learning_rate: np.float64):
         """
-        Computes dL/dZ_l given dL/dA_l as per MIT OCW 6.036 notation
+        Computes dL/dA_l-1 given dL/dZ_l as per MIT OCW 6.036 notation
 
         Parameters:
             output_error (np.float64): output error calculated by the following layer
@@ -69,4 +72,24 @@ class FullyConnectedLayer(Layer):
 
 
 class ActivationLayer(Layer):
-    pass
+    def __init__(self, activation: Callable[[Any], Any], activation_derivative: Callable[[Any], Any]):
+        self.activation = activation
+        self.d_activation = activation_derivative
+
+    def forward_pass(self, x: np.array):
+        self.input = x
+        self.output = self.activation(x)
+        return self.output
+
+    def backward_pass(self, output_error: np.float64, learning_rate: np.float64):
+        """
+        Computes dL/dZ_l given dL/dA_l as per MIT OCW 6.036 notation
+
+        Parameters:
+            output_error (np.float64): output error calculated by the following layer
+            learning_rate (np.float64): (not used in the activation layer because there are no parameters to update there)
+
+        Returns:
+            input_error (np.float64): output error of the previous layer
+        """
+        return self.d_activation(self.input) * output_error
