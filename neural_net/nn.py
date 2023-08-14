@@ -1,5 +1,6 @@
 from helpers.activation import *  # already imports numpy as np
 from helpers.cost import MSE
+from helpers.cost_derivatives import d_MSE
 from layer import *
 import random
 
@@ -19,5 +20,9 @@ import random
 
 
 class NeuralNetwork:
-    pass
+    def __init__(self, layers: list[type[Layer]], loss: Callable[[Any], Any] = MSE, d_loss: Callable[[Any], Any] = d_MSE):
+        self.layers = layers
+        self.loss = loss
+        self.d_loss = d_loss
+
 

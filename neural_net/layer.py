@@ -28,7 +28,7 @@ class FullyConnectedLayer(Layer):
 
         Parameters:
             m (int): input dimension
-            n (int): output dimension (can be interpreted as number of neurons in the layer)
+            n (int): output dimension (can be interpreted as number of neurons / linear units in the layer)
         """
         self.weights = np.random.rand(m, n)  # m weights for each of n neurons, can be neatly represented as a matrix
         self.bias = np.random.rand(1, n)  # n biases for n neurons
