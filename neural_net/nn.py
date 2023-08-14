@@ -20,7 +20,7 @@ import random
 
 
 class NeuralNetwork:
-    def __init__(self, layers: list[type[Layer]] = None, loss: Callable[[Any], Any] = MSE, d_loss: Callable[[Any], Any] = d_MSE):
+    def __init__(self, layers: list[type[Layer]] = [], loss: Callable[[Any], Any] = MSE, d_loss: Callable[[Any], Any] = d_MSE):
         """
         Sequential Neural Net constructor
 
@@ -36,4 +36,20 @@ class NeuralNetwork:
         self.loss = loss
         self.d_loss = d_loss
 
+    def addLayer(self, layer: type[Layer]):
+        """
+        Add layer to the network
 
+        Parameters:
+            layer (type[Layer]): new layer
+
+        Returns:
+            None
+        """
+        self.layers.append(layer)
+
+    def fit(self):
+        pass
+
+    def predict(self):
+        pass
