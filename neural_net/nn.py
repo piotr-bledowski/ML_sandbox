@@ -20,7 +20,18 @@ import random
 
 
 class NeuralNetwork:
-    def __init__(self, layers: list[type[Layer]], loss: Callable[[Any], Any] = MSE, d_loss: Callable[[Any], Any] = d_MSE):
+    def __init__(self, layers: list[type[Layer]] = None, loss: Callable[[Any], Any] = MSE, d_loss: Callable[[Any], Any] = d_MSE):
+        """
+        Sequential Neural Net constructor
+
+        Parameters: (all of them optional)
+            layers (list[type[Layer]]): initialize with layers
+            loss (Callable[[Any], Any]): initialize with a loss function (default - MSE)
+            d_loss (Callable[[Any], Any]): will be derived automatically from the provided loss function
+
+        Returns:
+            None
+        """
         self.layers = layers
         self.loss = loss
         self.d_loss = d_loss
