@@ -48,8 +48,21 @@ class NeuralNetwork:
         """
         self.layers.append(layer)
 
-    def fit(self):
+    def batchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int):
         pass
 
-    def predict(self):
+    def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, batch_size: int):
+        pass
+
+    def stochasticGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int):
+        pass
+
+    def fit(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, algorithm: str,
+            adaptive_step_size_method: str = '',
+            regularization_method: str = '',
+            batch_size: int = 1,
+            learning_rate: float = 0.001):
+        pass
+
+    def predict(self, x: np.array) -> np.array:
         pass
