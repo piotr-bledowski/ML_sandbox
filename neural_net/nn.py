@@ -142,4 +142,12 @@ class NeuralNetwork:
         pass
 
     def predict(self, x: np.array) -> np.array:
-        pass
+        predictions = []
+
+        for i in range(len(x)):
+            output = x[i]
+            for layer in self.layers:
+                output = layer.forward_pass(output)
+            predictions.append(output)
+
+        return np.array(predictions)
