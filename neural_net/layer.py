@@ -33,7 +33,7 @@ class FullyConnectedLayer(Layer):
         self.weights = np.random.rand(m, n)  # m weights for each of n neurons, can be neatly represented as a matrix
         self.bias = np.random.rand(1, n)  # n biases for n neurons
 
-    def forward_pass(self, x: np.array) -> np.array[np.float64]:
+    def forward_pass(self, x: np.array) -> np.array:
         """
         Instead of keeping track of every single neuron, we can multiply the layer's input
         by the layer's weight matrix getting the output vector which we can feed to an activation layer.

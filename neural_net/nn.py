@@ -1,5 +1,10 @@
-from helpers.activation import *  # already imports numpy as np
-from helpers.cost import MSE
+import sys
+import os
+
+sys.path.append(f'{os.getcwd()}/helpers')
+
+from activation import *  # already imports numpy as np
+from cost import MSE
 from helpers.cost_derivatives import d_MSE
 from layer import *
 import random

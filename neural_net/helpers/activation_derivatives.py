@@ -13,5 +13,5 @@ def d_sigmoid(z: np.float64) -> float:
 def d_tanh(z: np.float64) -> float:
     return 1.0 - tanh(z)**2
 
-# def d_softmax(z: np.array[np.float64]) -> np.array:
+# def d_softmax(z: np.array) -> np.array:
 #
