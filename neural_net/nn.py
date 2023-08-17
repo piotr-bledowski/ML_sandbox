@@ -20,7 +20,7 @@ import random
 
 
 class NeuralNetwork:
-    def __init__(self, layers: list[type[Layer]] = [], loss: Callable[[Any], Any] = MSE, d_loss: Callable[[Any], Any] = d_MSE):
+    def __init__(self, layers: list[type[Layer]] = [], loss: Callable[[Any, Any], Any] = MSE, d_loss: Callable[[Any, Any], Any] = d_MSE):
         """
         Sequential Neural Net constructor
 
@@ -35,6 +35,7 @@ class NeuralNetwork:
         self.layers = layers
         self.loss = loss
         self.d_loss = d_loss
+        self.training_errors = []
 
     def addLayer(self, layer: type[Layer]):
         """
@@ -48,13 +49,68 @@ class NeuralNetwork:
         """
         self.layers.append(layer)
 
-    def batchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int):
+    def batchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int,
+                             learning_rate: float = 0.001,
+                             adaptive_step_size_method: str = '',
+                             regularization_method: str = ''):
+        """
+        Batch gradient descent - optimizes on the entire dataset
+
+        Parameters:
+
+        Returns:
+            None
+        """
+        n_samples = len(train_X)
+
+        # keeping track of total mean error in each epoch to use it for plots and early stopping
+        epoch_errors = []
+
+        for i in range(n_epochs):
+            epoch_error = 0.0
+            for j in range(n_samples):
+                output = train_X[j]
+                # Forward propagation - making a prediction
+                for layer in self.layers:
+                    output = layer.forward_pass(output)
+
+                # summing epoch error with each datapoint
+                epoch_error += self.loss(train_y[j], output)
+
+                # Error back propagation - computing partial derivatives corresponding to each layer
+                error = self.d_loss(train_y[j], output)
+                for layer in reversed(self.layers):
+                    error = layer.backward_pass(error, learning_rate)
+
+            epoch_errors.append(epoch_error / n_samples)
+
+        self.training_errors = epoch_errors
+
+
+    def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, batch_size: int,
+                                 adaptive_step_size_method: str = '',
+                                 regularization_method: str = ''):
+        """
+        Mini-batch gradient descent - optimizes on a randomly selected part of the data set per iteration
+
+        Parameters:
+
+        Returns:
+            None
+        """
         pass
 
-    def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, batch_size: int):
-        pass
+    def stochasticGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int,
+                                  adaptive_step_size_method: str = '',
+                                  regularization_method: str = ''):
+        """
+        Batch gradient descent - optimizes on only one randomly selected datapoint
 
-    def stochasticGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int):
+        Parameters:
+
+        Returns:
+            None
+        """
         pass
 
     def fit(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, algorithm: str,
