@@ -70,7 +70,7 @@ class NeuralNetwork:
             epoch_error = 0.0
             for j in range(n_samples):
                 output = train_X[j]
-                # Forward propagation - making a prediction
+                # Forward propagation - computing output
                 for layer in self.layers:
                     output = layer.forward_pass(output)
 
@@ -85,7 +85,6 @@ class NeuralNetwork:
             epoch_errors.append(epoch_error / n_samples)
 
         self.training_errors = epoch_errors
-
 
     def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, batch_size: int,
                                  adaptive_step_size_method: str = '',
@@ -111,7 +110,29 @@ class NeuralNetwork:
         Returns:
             None
         """
-        pass
+        # keeping track of total mean error in each epoch to use it for plots and early stopping
+        epoch_errors = []
+
+        n_samples = len(train_X)
+
+        for i in range(n_epochs):
+            ind = random.randint(0, n_samples-1)  # pick a random datapoint by index
+            x = train_X[ind]
+            y = train_y[ind]
+
+            output = x
+            # Forward propagation - computing output
+            for layer in self.layers:
+                output = layer.forward_pass(output)
+
+            epoch_errors.append(self.loss(y, output))
+
+            # Error back propagation - computing partial derivatives corresponding to each layer
+            error = self.d_loss(y, output)
+            for layer in reversed(self.layers):
+                error = layer.backward_pass(error, 1.0 / i+1)
+
+        self.training_errors = epoch_errors
 
     def fit(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, algorithm: str,
             adaptive_step_size_method: str = '',
