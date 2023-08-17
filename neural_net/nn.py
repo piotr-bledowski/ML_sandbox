@@ -97,7 +97,18 @@ class NeuralNetwork:
         Returns:
             None
         """
-        pass
+
+        # keeping track of total mean error in each epoch to use it for plots and early stopping
+        epoch_errors = []
+
+        n_samples = len(train_X)
+
+        for i in range(n_epochs):
+            indices = np.random.choice(n_samples, batch_size)
+            self.batchGradientDescent(train_X[indices], train_y[indices], n_epochs=1)
+            epoch_errors.append(self.training_errors[0])
+
+        self.training_errors = epoch_errors
 
     def stochasticGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int,
                                   adaptive_step_size_method: str = '',
