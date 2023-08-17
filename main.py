@@ -39,7 +39,9 @@ from keras.utils import to_categorical
 
 train_data = pd.read_csv('mnist_test.csv')
 
+X_train = train_data.loc[:, train_data.columns != 'label']
 y_train = to_categorical(train_data['label'])
 
+print(X_train)
 print(y_train)
 
