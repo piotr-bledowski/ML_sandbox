@@ -30,8 +30,8 @@ class FullyConnectedLayer(Layer):
             m (int): input dimension
             n (int): output dimension (can be interpreted as number of neurons / linear units in the layer)
         """
-        self.weights = np.random.rand(m, n)  # m weights for each of n neurons, can be neatly represented as a matrix
-        self.bias = np.random.rand(1, n)  # n biases for n neurons
+        self.weights = np.random.rand(m, n) - 0.5  # m weights for each of n neurons, can be neatly represented as a matrix
+        self.bias = np.random.rand(1, n) - 0.5  # n biases for n neurons
 
     def forward_pass(self, x: np.array) -> np.array:
         """

@@ -48,7 +48,7 @@ X_train = train_data.loc[:, train_data.columns != 'label'].to_numpy(dtype=np.flo
 X_train = X_train[:1000]
 # print(X_train.dtype)
 X_train /= 255.0  # normalize
-y_train = np.array(to_categorical(train_data['label']))
+y_train = np.array(to_categorical(train_data['label']), dtype=np.float64)
 
 X_train = np.expand_dims(X_train, axis=1)
 
