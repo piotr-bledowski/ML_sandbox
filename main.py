@@ -11,6 +11,11 @@ import numpy as np
 from classification.models.perceptron import Perceptron
 from plotting import plotBinaryPoints, plotLine
 from neural_net.nn import NeuralNetwork
+from neural_net.layer import FullyConnectedLayer, ActivationLayer
+from neural_net.helpers.activation import *
+from neural_net.helpers.activation_derivatives import *
+from neural_net.helpers.cost import *
+from neural_net.helpers.cost_derivatives import *
 
 from keras.utils import to_categorical
 
@@ -37,11 +42,37 @@ from keras.utils import to_categorical
 # plt.show()
 
 
-train_data = pd.read_csv('mnist_test.csv')
+train_data = pd.read_csv('mnist_train.csv')
 
-X_train = train_data.loc[:, train_data.columns != 'label']
-y_train = to_categorical(train_data['label'])
+X_train = train_data.loc[:, train_data.columns != 'label'].to_numpy(dtype=np.float64)
+X_train = X_train[:1000]
+# print(X_train.dtype)
+X_train /= 255.0  # normalize
+y_train = np.array(to_categorical(train_data['label']))
 
-print(X_train)
-print(y_train)
+X_train = np.expand_dims(X_train, axis=1)
 
+print(X_train.shape)
+
+# print(X_train)
+# print(y_train)
+
+model = NeuralNetwork(layers=[
+        FullyConnectedLayer(784, 200),
+        ActivationLayer(sigmoid, d_sigmoid),
+        FullyConnectedLayer(200, 100),
+        ActivationLayer(sigmoid, d_sigmoid),
+        FullyConnectedLayer(100, 50),
+        ActivationLayer(sigmoid, d_sigmoid),
+        FullyConnectedLayer(50, 10),
+        ActivationLayer(sigmoid, d_sigmoid)
+    ])
+
+model.fit(X_train, y_train, n_epochs=1000, algorithm='mbgd', batch_size=100, learning_rate=0.1)
+
+test_data = pd.read_csv('mnist_test.csv')
+
+X_test = test_data.loc[:, train_data.columns != 'label']
+y_test = to_categorical(test_data['label'])
+
+predictions = []

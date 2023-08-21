@@ -49,7 +49,7 @@ class FullyConnectedLayer(Layer):
         self.output = np.dot(x, self.weights) + self.bias
         return self.output
 
-    def backward_pass(self, output_error: np.float64, learning_rate: np.float64):
+    def backward_pass(self, output_error: np.array, learning_rate: np.float64):
         """
         Computes dL/dA_l-1 given dL/dZ_l as per MIT OCW 6.036 notation
 

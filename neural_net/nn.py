@@ -25,7 +25,7 @@ import random
 
 
 class NeuralNetwork:
-    def __init__(self, layers: list[type[Layer]] = [], loss: Callable[[Any, Any], Any] = MSE, d_loss: Callable[[Any, Any], Any] = d_MSE):
+    def __init__(self, layers: list[type[Layer]], loss: Callable[[Any, Any], Any] = MSE, d_loss: Callable[[Any, Any], Any] = d_MSE):
         """
         Sequential Neural Net constructor
 
@@ -80,10 +80,10 @@ class NeuralNetwork:
                     output = layer.forward_pass(output)
 
                 # summing epoch error with each datapoint
-                epoch_error += self.loss(train_y[j], output)
+                epoch_error += self.loss(output, train_y[j])
 
                 # Error back propagation - computing partial derivatives corresponding to each layer
-                error = self.d_loss(train_y[j], output)
+                error = self.d_loss(output, train_y[j])
                 for layer in reversed(self.layers):
                     error = layer.backward_pass(error, learning_rate)
 
@@ -92,6 +92,7 @@ class NeuralNetwork:
         self.training_errors = epoch_errors
 
     def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, batch_size: int,
+                                 learning_rate: float = 0.001,
                                  adaptive_step_size_method: str = '',
                                  regularization_method: str = ''):
         """
@@ -109,9 +110,10 @@ class NeuralNetwork:
         n_samples = len(train_X)
 
         for i in range(n_epochs):
-            indices = np.random.choice(n_samples, batch_size)
-            self.batchGradientDescent(train_X[indices], train_y[indices], n_epochs=1)
+            indices = np.random.randint(0, n_samples, size=batch_size)
+            self.batchGradientDescent(train_X[indices], train_y[indices], n_epochs=1, learning_rate=learning_rate)
             epoch_errors.append(self.training_errors[0])
+            print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
 
         self.training_errors = epoch_errors
 
@@ -155,7 +157,12 @@ class NeuralNetwork:
             regularization_method: str = '',
             batch_size: int = 1,
             learning_rate: float = 0.001):
-        pass
+        if algorithm == 'bgd':
+            self.batchGradientDescent(train_X, train_y, n_epochs=n_epochs, learning_rate=learning_rate)
+        elif algorithm == 'mbgd':
+            self.miniBatchGradientDescent(train_X, train_y, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size)
+        elif algorithm == 'sgd':
+            self.stochasticGradientDescent(train_X, train_y, n_epochs=n_epochs)
 
     def predict(self, x: np.array) -> np.array:
         predictions = []
