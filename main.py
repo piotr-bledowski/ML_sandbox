@@ -45,34 +45,40 @@ from keras.utils import to_categorical
 train_data = pd.read_csv('mnist_train.csv')
 
 X_train = train_data.loc[:, train_data.columns != 'label'].to_numpy(dtype=np.float64)
-X_train = X_train[:1000]
 # print(X_train.dtype)
 X_train /= 255.0  # normalize
 y_train = np.array(to_categorical(train_data['label']), dtype=np.float64)
 
 X_train = np.expand_dims(X_train, axis=1)
 
-print(X_train.shape)
+# print(X_train.shape)
 
 # print(X_train)
 # print(y_train)
 
 model = NeuralNetwork(layers=[
-        FullyConnectedLayer(784, 200),
-        ActivationLayer(sigmoid, d_sigmoid),
-        FullyConnectedLayer(200, 100),
-        ActivationLayer(sigmoid, d_sigmoid),
-        FullyConnectedLayer(100, 50),
-        ActivationLayer(sigmoid, d_sigmoid),
-        FullyConnectedLayer(50, 10),
-        ActivationLayer(sigmoid, d_sigmoid)
-    ])
+    FullyConnectedLayer(784, 200),
+    ActivationLayer(sigmoid, d_sigmoid),
+    FullyConnectedLayer(200, 100),
+    ActivationLayer(sigmoid, d_sigmoid),
+    FullyConnectedLayer(100, 50),
+    ActivationLayer(sigmoid, d_sigmoid),
+    FullyConnectedLayer(50, 10),
+    ActivationLayer(sigmoid, d_sigmoid)
+])
 
-model.fit(X_train, y_train, n_epochs=1000, algorithm='mbgd', batch_size=100, learning_rate=0.1)
+model.fit(X_train, y_train, n_epochs=10000, algorithm='mbgd', batch_size=1000, learning_rate=0.001)
 
 test_data = pd.read_csv('mnist_test.csv')
 
-X_test = test_data.loc[:, train_data.columns != 'label']
-y_test = to_categorical(test_data['label'])
+X_test = test_data.loc[:, train_data.columns != 'label'].to_numpy(dtype=np.float64)
+X_test /= 255.0  # normalize
+X_test = np.expand_dims(X_test, axis=1)
+y_test = test_data['label']
 
-predictions = []
+predictions = np.array([np.argmax(p) for p in model.predict(X_test)])
+
+right = np.count_nonzero(predictions == y_test)
+wrong = len(y_test) - right
+
+print(f'{100.0*float(right)/float((right + wrong))}% accuracy')
