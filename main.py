@@ -51,6 +51,12 @@ y_train = np.array(to_categorical(train_data['label']), dtype=np.float64)
 
 X_train = np.expand_dims(X_train, axis=1)
 
+# Split into training and validation data
+X_valid = X_train[59000:]
+y_valid = y_train[59000:]
+X_train = X_train[:59000]
+y_train = y_train[:59000]
+
 # print(X_train.shape)
 
 # print(X_train)
@@ -67,7 +73,7 @@ model = NeuralNetwork(layers=[
     ActivationLayer(sigmoid, d_sigmoid)
 ])
 
-model.fit(X_train, y_train, n_epochs=20000, algorithm='mbgd', batch_size=1000, learning_rate=0.001)
+model.fit(X_train, y_train, n_epochs=10000, algorithm='mbgd', batch_size=1000, learning_rate=0.01)
 
 test_data = pd.read_csv('mnist_test.csv')
 
