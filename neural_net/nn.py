@@ -56,7 +56,7 @@ class NeuralNetwork:
         """
         self.layers.append(layer)
 
-    def batchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray,
+    def batchGradientDescent(self, X_train: np.ndarray, y_train: np.ndarray,
                              n_epochs: int,
                              X_valid: np.ndarray = None,
                              y_valid: np.ndarray = None,
@@ -71,7 +71,7 @@ class NeuralNetwork:
         Returns:
             None
         """
-        n_samples = len(train_X)
+        n_samples = len(X_train)
 
         # keeping track of total mean error in each epoch to use it for plots and early stopping
         epoch_errors = []
@@ -79,16 +79,16 @@ class NeuralNetwork:
         for i in range(n_epochs):
             epoch_error = 0.0
             for j in range(n_samples):
-                output = train_X[j]
+                output = X_train[j]
                 # Forward propagation - computing output
                 for layer in self.layers:
                     output = layer.forward_pass(output)
 
                 # summing epoch error with each datapoint
-                epoch_error += self.loss(output, train_y[j])
+                epoch_error += self.loss(output, y_train[j])
 
                 # Error back propagation - computing partial derivatives corresponding to each layer
-                error = self.d_loss(output, train_y[j])
+                error = self.d_loss(output, y_train[j])
                 for layer in reversed(self.layers):
                     error = layer.backward_pass(error, learning_rate)
 
@@ -96,10 +96,11 @@ class NeuralNetwork:
 
         self.training_errors = epoch_errors
 
-    def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray,
-                                 valid_X: np.ndarray,
-                                 valid_y: np.ndarray,
-                                 n_epochs: int, batch_size: int,
+    def miniBatchGradientDescent(self, X_train: np.ndarray, y_train: np.ndarray,
+                                 n_epochs: int,
+                                 batch_size: int,
+                                 X_valid: np.ndarray = None,
+                                 y_valid: np.ndarray = None,
                                  learning_rate: float = 0.001,
                                  adaptive_step_size_method: str = '',
                                  regularization_method: str = ''):
@@ -115,20 +116,20 @@ class NeuralNetwork:
         # keeping track of total mean error in each epoch to use it for plots and early stopping
         epoch_errors = []
 
-        n_samples = len(train_X)
+        n_samples = len(X_train)
 
         for i in range(n_epochs):
             indices = np.random.randint(0, n_samples, size=batch_size)
-            self.batchGradientDescent(train_X[indices], train_y[indices], n_epochs=1, learning_rate=learning_rate)
+            self.batchGradientDescent(X_train[indices], y_train[indices], X_valid=X_valid, y_valid=y_valid, n_epochs=1, learning_rate=learning_rate)
             epoch_errors.append(self.training_errors[0])
             print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
 
         self.training_errors = epoch_errors
 
-    def stochasticGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray,
-                                  valid_X: np.ndarray,
-                                  valid_y: np.ndarray,
+    def stochasticGradientDescent(self, X_train: np.ndarray, y_train: np.ndarray,
                                   n_epochs: int,
+                                  X_valid: np.ndarray = None,
+                                  y_valid: np.ndarray = None,
                                   learning_rate: float = 0.5,
                                   adaptive_step_size_method: str = '',
                                   regularization_method: str = ''):
@@ -143,12 +144,12 @@ class NeuralNetwork:
         # keeping track of total mean error in each epoch to use it for plots and early stopping
         epoch_errors = []
 
-        n_samples = len(train_X)
+        n_samples = len(X_train)
 
         for i in range(n_epochs):
             ind = random.randint(0, n_samples-1)  # pick a random datapoint by index
-            x = train_X[ind]
-            y = train_y[ind]
+            x = X_train[ind]
+            y = y_train[ind]
 
             output = x
             # Forward propagation - computing output
@@ -168,22 +169,22 @@ class NeuralNetwork:
         self.training_errors = epoch_errors
 
     def fit(self,
-            train_X: np.ndarray,
-            train_y: np.ndarray,
-            valid_X: np.ndarray,
-            valid_y: np.ndarray,
+            X_train: np.ndarray,
+            y_train: np.ndarray,
             n_epochs: int,
             algorithm: str,
+            X_valid: np.ndarray = None,
+            y_valid: np.ndarray = None,
             adaptive_step_size_method: str = '',
             regularization_method: str = '',
             batch_size: int = 1,
             learning_rate: float = 0.001):
         if algorithm == 'bgd':
-            self.batchGradientDescent(train_X, train_y, valid_X, valid_y, n_epochs=n_epochs, learning_rate=learning_rate)
+            self.batchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate)
         elif algorithm == 'mbgd':
-            self.miniBatchGradientDescent(train_X, train_y, valid_X, valid_y, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size)
+            self.miniBatchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size)
         elif algorithm == 'sgd':
-            self.stochasticGradientDescent(train_X, train_y, valid_X, valid_y, n_epochs=n_epochs, learning_rate=learning_rate)
+            self.stochasticGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate)
 
     def predict(self, x: np.array) -> np.array:
         predictions = []
