@@ -1,6 +1,8 @@
 import sys
 import os
 
+import numpy as np
+
 sys.path.append(f'{os.getcwd()}/helpers')
 
 from activation import *  # already imports numpy as np
@@ -54,7 +56,10 @@ class NeuralNetwork:
         """
         self.layers.append(layer)
 
-    def batchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int,
+    def batchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray,
+                             n_epochs: int,
+                             X_valid: np.ndarray = None,
+                             y_valid: np.ndarray = None,
                              learning_rate: float = 0.001,
                              adaptive_step_size_method: str = '',
                              regularization_method: str = ''):
@@ -91,7 +96,10 @@ class NeuralNetwork:
 
         self.training_errors = epoch_errors
 
-    def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, batch_size: int,
+    def miniBatchGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray,
+                                 valid_X: np.ndarray,
+                                 valid_y: np.ndarray,
+                                 n_epochs: int, batch_size: int,
                                  learning_rate: float = 0.001,
                                  adaptive_step_size_method: str = '',
                                  regularization_method: str = ''):
@@ -117,7 +125,11 @@ class NeuralNetwork:
 
         self.training_errors = epoch_errors
 
-    def stochasticGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int,
+    def stochasticGradientDescent(self, train_X: np.ndarray, train_y: np.ndarray,
+                                  valid_X: np.ndarray,
+                                  valid_y: np.ndarray,
+                                  n_epochs: int,
+                                  learning_rate: float = 0.5,
                                   adaptive_step_size_method: str = '',
                                   regularization_method: str = ''):
         """
@@ -143,26 +155,35 @@ class NeuralNetwork:
             for layer in self.layers:
                 output = layer.forward_pass(output)
 
-            epoch_errors.append(self.loss(y, output))
-
             # Error back propagation - computing partial derivatives corresponding to each layer
-            error = self.d_loss(y, output)
+            error = self.d_loss(output, y)
+
+            epoch_errors.append(self.loss(output, y))
+
+            print(f'Epoch {i + 1} training error: {epoch_errors[-1]}')
+
             for layer in reversed(self.layers):
-                error = layer.backward_pass(error, 1.0 / i+1)
+                error = layer.backward_pass(error, learning_rate)
 
         self.training_errors = epoch_errors
 
-    def fit(self, train_X: np.ndarray, train_y: np.ndarray, n_epochs: int, algorithm: str,
+    def fit(self,
+            train_X: np.ndarray,
+            train_y: np.ndarray,
+            valid_X: np.ndarray,
+            valid_y: np.ndarray,
+            n_epochs: int,
+            algorithm: str,
             adaptive_step_size_method: str = '',
             regularization_method: str = '',
             batch_size: int = 1,
             learning_rate: float = 0.001):
         if algorithm == 'bgd':
-            self.batchGradientDescent(train_X, train_y, n_epochs=n_epochs, learning_rate=learning_rate)
+            self.batchGradientDescent(train_X, train_y, valid_X, valid_y, n_epochs=n_epochs, learning_rate=learning_rate)
         elif algorithm == 'mbgd':
-            self.miniBatchGradientDescent(train_X, train_y, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size)
+            self.miniBatchGradientDescent(train_X, train_y, valid_X, valid_y, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size)
         elif algorithm == 'sgd':
-            self.stochasticGradientDescent(train_X, train_y, n_epochs=n_epochs)
+            self.stochasticGradientDescent(train_X, train_y, valid_X, valid_y, n_epochs=n_epochs, learning_rate=learning_rate)
 
     def predict(self, x: np.array) -> np.array:
         predictions = []

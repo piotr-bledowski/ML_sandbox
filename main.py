@@ -73,7 +73,8 @@ model = NeuralNetwork(layers=[
     ActivationLayer(sigmoid, d_sigmoid)
 ])
 
-model.fit(X_train, y_train, n_epochs=10000, algorithm='mbgd', batch_size=1000, learning_rate=0.01)
+# model.fit(X_train, y_train, X_valid, y_valid, n_epochs=1000, algorithm='mbgd', batch_size=100, learning_rate=0.1)
+model.fit(X_train, y_train, X_valid, y_valid, n_epochs=300000, algorithm='sgd', learning_rate=0.01)
 
 test_data = pd.read_csv('mnist_test.csv')
 
