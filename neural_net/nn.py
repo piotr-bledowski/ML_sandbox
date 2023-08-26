@@ -43,6 +43,7 @@ class NeuralNetwork:
         self.loss = loss
         self.d_loss = d_loss
         self.training_errors = []
+        self.validation_errors = []
 
     def addLayer(self, layer: type[Layer]):
         """
@@ -122,7 +123,10 @@ class NeuralNetwork:
             indices = np.random.randint(0, n_samples, size=batch_size)
             self.batchGradientDescent(X_train[indices], y_train[indices], X_valid=X_valid, y_valid=y_valid, n_epochs=1, learning_rate=learning_rate)
             epoch_errors.append(self.training_errors[0])
+            validation_error = self.validationError(X_valid, y_valid)
+            self.validation_errors.append(validation_error)
             print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
+            print(f'Epoch {i + 1} validation error: {validation_error}')
 
         self.training_errors = epoch_errors
 
@@ -193,6 +197,21 @@ class NeuralNetwork:
             output = x[i]
             for layer in self.layers:
                 output = layer.forward_pass(output)
-            predictions.append(output)
+            predictions.append(np.argmax(output))
 
         return np.array(predictions)
+
+    def validationError(self, X_valid, y_valid):
+        error = 0.0
+        for i in range(len(X_valid)):
+            output = X_valid[i]
+            for layer in self.layers:
+                output = layer.forward_pass(output)
+            error += self.loss(output, y_valid[i])
+        return error / len(y_valid)
+
+    def validatePercent(self, X_valid, y_valid):
+        predictions = self.predict(X_valid)
+        right = np.count_nonzero(predictions == y_valid)
+        wrong = len(y_valid) - right
+        return float(right)/float((right + wrong))

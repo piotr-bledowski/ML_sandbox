@@ -73,8 +73,9 @@ model = NeuralNetwork(layers=[
     ActivationLayer(sigmoid, d_sigmoid)
 ])
 
-# model.fit(X_train, y_train, X_valid, y_valid, n_epochs=1000, algorithm='mbgd', batch_size=100, learning_rate=0.1)
-model.fit(X_train, y_train, X_valid, y_valid, n_epochs=300000, algorithm='sgd', learning_rate=0.01)
+# model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=10, algorithm='bgd', learning_rate=0.1)
+model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=1000, algorithm='mbgd', batch_size=100, learning_rate=0.1)
+# model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=300000, algorithm='sgd', learning_rate=0.01)
 
 test_data = pd.read_csv('mnist_test.csv')
 
@@ -83,9 +84,6 @@ X_test /= 255.0  # normalize
 X_test = np.expand_dims(X_test, axis=1)
 y_test = test_data['label']
 
-predictions = np.array([np.argmax(p) for p in model.predict(X_test)])
+print(f'{100.0 * model.validatePercent(X_test, y_test)}% accuracy')
 
-right = np.count_nonzero(predictions == y_test)
-wrong = len(y_test) - right
 
-print(f'{100.0*float(right)/float((right + wrong))}% accuracy')
