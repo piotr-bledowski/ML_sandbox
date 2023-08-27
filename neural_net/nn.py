@@ -68,7 +68,14 @@ class NeuralNetwork:
         Batch gradient descent - optimizes on the entire dataset
 
         Parameters:
-
+            X_train (np.ndarray): training non-target data
+            y_train (np.ndarray): training target data
+            n_epochs (int): number of training epochs
+            learning_rate (float): learning rate
+            X_valid (np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
+            regularization_method (str): optional ()
         Returns:
             None
         """
@@ -109,7 +116,15 @@ class NeuralNetwork:
         Mini-batch gradient descent - optimizes on a randomly selected part of the data set per iteration
 
         Parameters:
-
+            X_train (np.ndarray): training non-target data
+            y_train (np.ndarray): training target data
+            n_epochs (int): number of training epochs
+            learning_rate (float): learning rate
+            batch_size (int): batch size for mini-batch gradient descent only
+            X_valid (np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
+            regularization_method (str): optional ()
         Returns:
             None
         """
@@ -147,6 +162,8 @@ class NeuralNetwork:
             learning_rate (float): learning rate
             X_valid (np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
             y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
+            regularization_method (str): optional ()
         Returns:
             None
         """
@@ -201,7 +218,7 @@ class NeuralNetwork:
             y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
             adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
             regularization_method (str): ()
-            batch_size (int): batch size for mini-batch gradient descent only
+            batch_size (int): batch size required for mini-batch gradient descent only
         Returns:
             None
         """
