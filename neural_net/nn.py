@@ -59,9 +59,9 @@ class NeuralNetwork:
 
     def batchGradientDescent(self, X_train: np.ndarray, y_train: np.ndarray,
                              n_epochs: int,
+                             learning_rate: float,
                              X_valid: np.ndarray = None,
                              y_valid: np.ndarray = None,
-                             learning_rate: float = 0.001,
                              adaptive_step_size_method: str = '',
                              regularization_method: str = ''):
         """
@@ -99,10 +99,10 @@ class NeuralNetwork:
 
     def miniBatchGradientDescent(self, X_train: np.ndarray, y_train: np.ndarray,
                                  n_epochs: int,
+                                 learning_rate: float,
                                  batch_size: int,
                                  X_valid: np.ndarray = None,
                                  y_valid: np.ndarray = None,
-                                 learning_rate: float = 0.001,
                                  adaptive_step_size_method: str = '',
                                  regularization_method: str = ''):
         """
@@ -132,16 +132,21 @@ class NeuralNetwork:
 
     def stochasticGradientDescent(self, X_train: np.ndarray, y_train: np.ndarray,
                                   n_epochs: int,
+                                  learning_rate: float,
                                   X_valid: np.ndarray = None,
                                   y_valid: np.ndarray = None,
-                                  learning_rate: float = 0.5,
                                   adaptive_step_size_method: str = '',
                                   regularization_method: str = ''):
         """
         Batch gradient descent - optimizes on only one randomly selected datapoint
 
         Parameters:
-
+            X_train (np.ndarray): training non-target data
+            y_train (np.ndarray): training target data
+            n_epochs (int): number of training epochs
+            learning_rate (float): learning rate
+            X_valid (np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
         Returns:
             None
         """
@@ -176,19 +181,39 @@ class NeuralNetwork:
             X_train: np.ndarray,
             y_train: np.ndarray,
             n_epochs: int,
+            learning_rate: float,
             algorithm: str,
             X_valid: np.ndarray = None,
             y_valid: np.ndarray = None,
             adaptive_step_size_method: str = '',
             regularization_method: str = '',
-            batch_size: int = 1,
-            learning_rate: float = 0.001):
+            batch_size: int = 1,):
+        """
+        fit the Neural Network to some training data
+
+        Parameters:
+            X_train (np.ndarray): training non-target data
+            y_train (np.ndarray): training target data
+            n_epochs (int): number of training epochs
+            learning_rate (float): learning rate
+            algorithm (str): type of gradient descent algorithm (bgd, mbgd, sgd)
+            X_valid (np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
+            adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
+            regularization_method (str): ()
+            batch_size (int): batch size for mini-batch gradient descent only
+        Returns:
+            None
+        """
         if algorithm == 'bgd':
-            self.batchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate)
+            self.batchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate,
+                                      adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method)
         elif algorithm == 'mbgd':
-            self.miniBatchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size)
+            self.miniBatchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size,
+                                          adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method)
         elif algorithm == 'sgd':
-            self.stochasticGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate)
+            self.stochasticGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate,
+                                           adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method)
 
     def predict(self, x: np.array) -> np.array:
         predictions = []

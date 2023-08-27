@@ -73,8 +73,11 @@ model = NeuralNetwork(layers=[
     ActivationLayer(sigmoid, d_sigmoid)
 ])
 
+# I define it here since it's possibly used twice, (model training and optional plotting)
+N_EPOCHS = 10000
+
 # model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=10, algorithm='bgd', learning_rate=0.1)
-model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=1000, algorithm='mbgd', batch_size=100, learning_rate=0.1)
+model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=N_EPOCHS, algorithm='mbgd', batch_size=500, learning_rate=0.1)
 # model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=300000, algorithm='sgd', learning_rate=0.01)
 
 test_data = pd.read_csv('mnist_test.csv')
@@ -86,4 +89,11 @@ y_test = test_data['label']
 
 print(f'{100.0 * model.validatePercent(X_test, y_test)}% accuracy')
 
+fig, ax = plt.subplots()
 
+epochs = np.arange(1, N_EPOCHS+1, 1)
+
+ax.plot(epochs, model.training_errors, color='blue')
+ax.plot(epochs, model.validation_errors, color='green')
+
+plt.show()
