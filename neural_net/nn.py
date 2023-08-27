@@ -138,10 +138,11 @@ class NeuralNetwork:
             indices = np.random.randint(0, n_samples, size=batch_size)
             self.batchGradientDescent(X_train[indices], y_train[indices], X_valid=X_valid, y_valid=y_valid, n_epochs=1, learning_rate=learning_rate)
             epoch_errors.append(self.training_errors[0])
-            validation_error = self.validationError(X_valid, y_valid)
-            self.validation_errors.append(validation_error)
             print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
-            print(f'Epoch {i + 1} validation error: {validation_error}')
+            if X_valid and y_valid:
+                validation_error = self.validationError(X_valid, y_valid)
+                self.validation_errors.append(validation_error)
+                print(f'Epoch {i + 1} validation error: {validation_error}')
 
         self.training_errors = epoch_errors
 
