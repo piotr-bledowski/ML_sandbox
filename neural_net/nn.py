@@ -63,7 +63,8 @@ class NeuralNetwork:
                              X_valid: np.ndarray = None,
                              y_valid: np.ndarray = None,
                              adaptive_step_size_method: str = '',
-                             regularization_method: str = ''):
+                             regularization_method: str = '',
+                             gamma: np.float64 = 0.9):
         """
         Batch gradient descent - optimizes on the entire dataset
 
@@ -76,6 +77,7 @@ class NeuralNetwork:
             y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
             adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
             regularization_method (str): optional ()
+            gamma (np.float64): optional momentum constant, 0.9 by default
         Returns:
             None
         """
@@ -85,8 +87,23 @@ class NeuralNetwork:
         epoch_errors = []
 
         if adaptive_step_size_method == 'momentum':
-            # TODO momentum
-            pass
+            for i in range(n_epochs):
+                epoch_error = 0.0
+                for j in range(n_samples):
+                    output = X_train[j]
+                    # Forward propagation - computing output
+                    for layer in self.layers:
+                        output = layer.forward_pass(output)
+
+                    # summing epoch error with each datapoint
+                    epoch_error += self.loss(output, y_train[j])
+
+                    # Error back propagation - computing partial derivatives corresponding to each layer
+                    error = self.d_loss(output, y_train[j])
+                    for layer in reversed(self.layers):
+                        error = layer.backwardPassMomentum(error, learning_rate, gamma)
+
+                epoch_errors.append(epoch_error / n_samples)
         elif adaptive_step_size_method == 'adadelta':
             # TODO adadelta
             pass
@@ -122,7 +139,8 @@ class NeuralNetwork:
                                  X_valid: np.ndarray = None,
                                  y_valid: np.ndarray = None,
                                  adaptive_step_size_method: str = '',
-                                 regularization_method: str = ''):
+                                 regularization_method: str = '',
+                                 gamma: np.float64 = 0.9):
         """
         Mini-batch gradient descent - optimizes on a randomly selected part of the data set per iteration
 
@@ -136,6 +154,7 @@ class NeuralNetwork:
             y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
             adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
             regularization_method (str): optional ()
+            gamma (np.float64): optional momentum constant, 0.9 by default
         Returns:
             None
         """
@@ -145,26 +164,15 @@ class NeuralNetwork:
 
         n_samples = len(X_train)
 
-        if adaptive_step_size_method == 'momentum':
-            # TODO momentum
-            pass
-        elif adaptive_step_size_method == 'adadelta':
-            # TODO adadelta
-            pass
-        elif adaptive_step_size_method == 'adam':
-            # TODO adam
-            pass
-        else:
-            # no fancy adaptive step size methods
-            for i in range(n_epochs):
-                indices = np.random.randint(0, n_samples, size=batch_size)
-                self.batchGradientDescent(X_train[indices], y_train[indices], X_valid=X_valid, y_valid=y_valid, n_epochs=1, learning_rate=learning_rate)
-                epoch_errors.append(self.training_errors[0])
-                print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
-                if X_valid and y_valid:
-                    validation_error = self.validationError(X_valid, y_valid)
-                    self.validation_errors.append(validation_error)
-                    print(f'Epoch {i + 1} validation error: {validation_error}')
+        for i in range(n_epochs):
+            indices = np.random.randint(0, n_samples, size=batch_size)
+            self.batchGradientDescent(X_train[indices], y_train[indices], X_valid=X_valid, y_valid=y_valid, n_epochs=1, learning_rate=learning_rate, adaptive_step_size_method=adaptive_step_size_method)
+            epoch_errors.append(self.training_errors[0])
+            print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
+            if X_valid is not None and y_valid is not None:
+                validation_error = self.validationError(X_valid, y_valid)
+                self.validation_errors.append(validation_error)
+                print(f'Epoch {i + 1} validation error: {validation_error}')
 
         self.training_errors = epoch_errors
 
@@ -174,7 +182,8 @@ class NeuralNetwork:
                                   X_valid: np.ndarray = None,
                                   y_valid: np.ndarray = None,
                                   adaptive_step_size_method: str = '',
-                                  regularization_method: str = ''):
+                                  regularization_method: str = '',
+                                  gamma: np.float64 = 0.9):
         """
         Batch gradient descent - optimizes on only one randomly selected datapoint
 
@@ -187,6 +196,7 @@ class NeuralNetwork:
             y_valid(np.ndarray): optional validation data necessary for early stopping and keeping track of validation error along training in general
             adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
             regularization_method (str): optional ()
+            gamma (np.float64): optional momentum constant, 0.9 by default
         Returns:
             None
         """
@@ -196,8 +206,25 @@ class NeuralNetwork:
         n_samples = len(X_train)
 
         if adaptive_step_size_method == 'momentum':
-            # TODO momentum
-            pass
+            for i in range(n_epochs):
+                ind = random.randint(0, n_samples - 1)  # pick a random datapoint by index
+                x = X_train[ind]
+                y = y_train[ind]
+
+                output = x
+                # Forward propagation - computing output
+                for layer in self.layers:
+                    output = layer.forward_pass(output)
+
+                # Error back propagation - computing partial derivatives corresponding to each layer
+                error = self.d_loss(output, y)
+
+                epoch_errors.append(self.loss(output, y))
+
+                print(f'Epoch {i + 1} training error: {epoch_errors[-1]}')
+
+                for layer in reversed(self.layers):
+                    error = layer.backward_pass(error, learning_rate, gamma)
         elif adaptive_step_size_method == 'adadelta':
             # TODO adadelta
             pass
@@ -238,7 +265,8 @@ class NeuralNetwork:
             y_valid: np.ndarray = None,
             adaptive_step_size_method: str = '',
             regularization_method: str = '',
-            batch_size: int = 1,):
+            batch_size: int = 1,
+            gamma: np.float64 = 0.9):
         """
         fit the Neural Network to some training data
 
@@ -253,6 +281,7 @@ class NeuralNetwork:
             adaptive_step_size_method (str): optional method to improve learning by making step size adaptive (momentum, adadelta, adam)
             regularization_method (str): ()
             batch_size (int): batch size required for mini-batch gradient descent only
+            gamma (np.float64): optional momentum constant, 0.9 by default
         Returns:
             None
         """

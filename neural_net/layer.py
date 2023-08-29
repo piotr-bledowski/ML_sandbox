@@ -32,6 +32,8 @@ class FullyConnectedLayer(Layer):
         """
         self.weights = np.random.rand(m, n) - 0.5  # m weights for each of n neurons, can be neatly represented as a matrix
         self.bias = np.random.rand(1, n) - 0.5  # n biases for n neurons
+        self.weights_momentum = 0
+        self.bias_momentum = 0
 
     def forward_pass(self, x: np.array) -> np.array:
         """
@@ -70,6 +72,31 @@ class FullyConnectedLayer(Layer):
 
         return input_error
 
+    def backwardPassMomentum(self, output_error: np.array, learning_rate: np.float64, gamma: np.float64 = 0.9):
+        """
+                Computes dL/dA_l-1 given dL/dZ_l as per MIT OCW 6.036 notation
+
+                Parameters:
+                    output_error (np.float64): output error calculated by the following layer
+                    learning_rate (np.float64)
+                    gamma (np.float64): momentum constant
+
+                Returns:
+                    input_error (np.float64): output error of the previous layer
+                """
+        input_error = np.dot(output_error, self.weights.T)
+        weights_error = np.dot(self.input.T, output_error)
+
+        # Exponential Moving Average implementation for both weights and bias
+
+        self.weights_momentum = gamma * self.weights_momentum + (1 - gamma) * weights_error
+        self.bias_momentum = gamma * self.bias_momentum + (1 - gamma) * output_error
+
+        self.weights -= learning_rate * self.weights_momentum
+        self.bias -= learning_rate * self.bias_momentum
+
+        return input_error
+
 
 class ActivationLayer(Layer):
     def __init__(self, activation: Callable[[Any], Any], activation_derivative: Callable[[Any], Any]):
@@ -93,3 +120,6 @@ class ActivationLayer(Layer):
             input_error (np.float64): output error of the previous layer
         """
         return self.d_activation(self.input) * output_error
+
+    def backwardPassMomentum(self, output_error: np.array, learning_rate: np.float64, gamma: np.float64 = 0.9):
+        return self.backward_pass(output_error, learning_rate)
