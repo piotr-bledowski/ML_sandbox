@@ -7,14 +7,14 @@ class Layer:
         self.input = None
         self.output = None
 
-    def forward_pass(self, x: np.array):
+    def forwardPass(self, x: np.array):
         """
         Computes the output of a layer for a given input
         Z_l or A_l depending on the layer's type as per MIT OCW 6.036 notation
         """
         pass
 
-    def backward_pass(self, output_error: np.float64, learning_rate: np.float64):
+    def backwardPass(self, output_error: np.float64, learning_rate: np.float64):
         """
         Computes dL/dZ_l given dL/dA_l as per MIT OCW 6.036 notation
         """
@@ -35,7 +35,7 @@ class FullyConnectedLayer(Layer):
         self.weights_momentum = 0
         self.bias_momentum = 0
 
-    def forward_pass(self, x: np.array) -> np.array:
+    def forwardPass(self, x: np.array) -> np.array:
         """
         Instead of keeping track of every single neuron, we can multiply the layer's input
         by the layer's weight matrix getting the output vector which we can feed to an activation layer.
@@ -51,7 +51,7 @@ class FullyConnectedLayer(Layer):
         self.output = np.dot(x, self.weights) + self.bias
         return self.output
 
-    def backward_pass(self, output_error: np.array, learning_rate: np.float64):
+    def backwardPass(self, output_error: np.array, learning_rate: np.float64):
         """
         Computes dL/dA_l-1 given dL/dZ_l as per MIT OCW 6.036 notation
 
@@ -103,12 +103,12 @@ class ActivationLayer(Layer):
         self.activation = activation
         self.d_activation = activation_derivative
 
-    def forward_pass(self, x: np.array):
+    def forwardPass(self, x: np.array):
         self.input = x
         self.output = self.activation(x)
         return self.output
 
-    def backward_pass(self, output_error: np.float64, learning_rate: np.float64):
+    def backwardPass(self, output_error: np.float64, learning_rate: np.float64):
         """
         Computes dL/dZ_l given dL/dA_l as per MIT OCW 6.036 notation
 
@@ -122,4 +122,4 @@ class ActivationLayer(Layer):
         return self.d_activation(self.input) * output_error
 
     def backwardPassMomentum(self, output_error: np.array, learning_rate: np.float64, gamma: np.float64 = 0.9):
-        return self.backward_pass(output_error, learning_rate)
+        return self.backwardPass(output_error, learning_rate)

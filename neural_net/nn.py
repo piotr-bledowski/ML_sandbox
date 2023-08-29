@@ -93,7 +93,7 @@ class NeuralNetwork:
                     output = X_train[j]
                     # Forward propagation - computing output
                     for layer in self.layers:
-                        output = layer.forward_pass(output)
+                        output = layer.forwardPass(output)
 
                     # summing epoch error with each datapoint
                     epoch_error += self.loss(output, y_train[j])
@@ -118,7 +118,7 @@ class NeuralNetwork:
                     output = X_train[j]
                     # Forward propagation - computing output
                     for layer in self.layers:
-                        output = layer.forward_pass(output)
+                        output = layer.forwardPass(output)
 
                     # summing epoch error with each datapoint
                     epoch_error += self.loss(output, y_train[j])
@@ -126,7 +126,7 @@ class NeuralNetwork:
                     # Error back propagation - computing partial derivatives corresponding to each layer
                     error = self.d_loss(output, y_train[j])
                     for layer in reversed(self.layers):
-                        error = layer.backward_pass(error, learning_rate)
+                        error = layer.backwardPass(error, learning_rate)
 
                 epoch_errors.append(epoch_error / n_samples)
 
@@ -214,7 +214,7 @@ class NeuralNetwork:
                 output = x
                 # Forward propagation - computing output
                 for layer in self.layers:
-                    output = layer.forward_pass(output)
+                    output = layer.forwardPass(output)
 
                 # Error back propagation - computing partial derivatives corresponding to each layer
                 error = self.d_loss(output, y)
@@ -224,7 +224,7 @@ class NeuralNetwork:
                 print(f'Epoch {i + 1} training error: {epoch_errors[-1]}')
 
                 for layer in reversed(self.layers):
-                    error = layer.backward_pass(error, learning_rate, gamma)
+                    error = layer.backwardPassMomentum(error, learning_rate, gamma)
         elif adaptive_step_size_method == 'adadelta':
             # TODO adadelta
             pass
@@ -241,7 +241,7 @@ class NeuralNetwork:
                 output = x
                 # Forward propagation - computing output
                 for layer in self.layers:
-                    output = layer.forward_pass(output)
+                    output = layer.forwardPass(output)
 
                 # Error back propagation - computing partial derivatives corresponding to each layer
                 error = self.d_loss(output, y)
@@ -251,7 +251,7 @@ class NeuralNetwork:
                 print(f'Epoch {i + 1} training error: {epoch_errors[-1]}')
 
                 for layer in reversed(self.layers):
-                    error = layer.backward_pass(error, learning_rate)
+                    error = layer.backwardPass(error, learning_rate)
 
         self.training_errors = epoch_errors
 
@@ -301,7 +301,7 @@ class NeuralNetwork:
         for i in range(len(x)):
             output = x[i]
             for layer in self.layers:
-                output = layer.forward_pass(output)
+                output = layer.forwardPass(output)
             predictions.append(np.argmax(output))
 
         return np.array(predictions)
@@ -311,7 +311,7 @@ class NeuralNetwork:
         for i in range(len(X_valid)):
             output = X_valid[i]
             for layer in self.layers:
-                output = layer.forward_pass(output)
+                output = layer.forwardPass(output)
             error += self.loss(output, y_valid[i])
         return error / len(y_valid)
 
