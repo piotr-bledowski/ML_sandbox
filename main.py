@@ -77,7 +77,7 @@ model = NeuralNetwork(layers=[
 N_EPOCHS = 1000
 
 # model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=10, algorithm='bgd', learning_rate=0.1)
-model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=N_EPOCHS, algorithm='mbgd', batch_size=100, learning_rate=0.1, adaptive_step_size_method='adadelta', gamma=0.9)
+model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=N_EPOCHS, algorithm='mbgd', batch_size=100, learning_rate=0.1, adaptive_step_size_method='adam')
 # model.fit(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=300000, algorithm='sgd', learning_rate=0.01)
 
 test_data = pd.read_csv('mnist_test.csv')

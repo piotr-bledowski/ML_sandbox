@@ -129,8 +129,23 @@ class NeuralNetwork:
 
                 epoch_errors.append(epoch_error / n_samples)
         elif adaptive_step_size_method == 'adam':
-            # TODO adam
-            pass
+            for i in range(n_epochs):
+                epoch_error = 0.0
+                for j in range(n_samples):
+                    output = X_train[j]
+                    # Forward propagation - computing output
+                    for layer in self.layers:
+                        output = layer.forwardPass(output)
+
+                    # summing epoch error with each datapoint
+                    epoch_error += self.loss(output, y_train[j])
+
+                    # Error back propagation - computing partial derivatives corresponding to each layer
+                    error = self.d_loss(output, y_train[j])
+                    for layer in reversed(self.layers):
+                        error = layer.backwardPassAdam(error, learning_rate, epsilon, beta_1, beta_2)
+
+                epoch_errors.append(epoch_error / n_samples)
         else:
             # no fancy adaptive step size methods
             for i in range(n_epochs):
@@ -195,7 +210,8 @@ class NeuralNetwork:
             indices = np.random.randint(0, n_samples, size=batch_size)
             self.batchGradientDescent(X_train[indices], y_train[indices], X_valid=X_valid, y_valid=y_valid, n_epochs=1,
                                       learning_rate=learning_rate, adaptive_step_size_method=adaptive_step_size_method,
-                                      regularization_method=regularization_method, gamma=gamma, epsilon=epsilon)
+                                      regularization_method=regularization_method, gamma=gamma, epsilon=epsilon,
+                                      beta_1=beta_1, beta_2=beta_2)
             epoch_errors.append(self.training_errors[0])
             print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
             if X_valid is not None and y_valid is not None:
@@ -281,8 +297,25 @@ class NeuralNetwork:
                 for layer in reversed(self.layers):
                     error = layer.backwardPassAdadelta(error, learning_rate, gamma, epsilon)
         elif adaptive_step_size_method == 'adam':
-            # TODO adam
-            pass
+            for i in range(n_epochs):
+                ind = random.randint(0, n_samples - 1)  # pick a random datapoint by index
+                x = X_train[ind]
+                y = y_train[ind]
+
+                output = x
+                # Forward propagation - computing output
+                for layer in self.layers:
+                    output = layer.forwardPass(output)
+
+                # Error back propagation - computing partial derivatives corresponding to each layer
+                error = self.d_loss(output, y)
+
+                epoch_errors.append(self.loss(output, y))
+
+                print(f'Epoch {i + 1} training error: {epoch_errors[-1]}')
+
+                for layer in reversed(self.layers):
+                    error = layer.backwardPassAdam(error, learning_rate, epsilon, beta_1, beta_2)
         else:
             # no fancy adaptive step size methods
             for i in range(n_epochs):
@@ -345,13 +378,16 @@ class NeuralNetwork:
         """
         if algorithm == 'bgd':
             self.batchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate,
-                                      adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method, gamma=gamma, epsilon=epsilon)
+                                      adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method,
+                                      gamma=gamma, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
         elif algorithm == 'mbgd':
             self.miniBatchGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate, batch_size=batch_size,
-                                          adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method, gamma=gamma, epsilon=epsilon)
+                                          adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method,
+                                          gamma=gamma, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
         elif algorithm == 'sgd':
             self.stochasticGradientDescent(X_train, y_train, X_valid=X_valid, y_valid=y_valid, n_epochs=n_epochs, learning_rate=learning_rate,
-                                           adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method, gamma=gamma, epsilon=epsilon)
+                                           adaptive_step_size_method=adaptive_step_size_method, regularization_method=regularization_method,
+                                           gamma=gamma, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
 
     def predict(self, x: np.array) -> np.array:
         predictions = []
