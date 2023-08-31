@@ -156,15 +156,15 @@ class FullyConnectedLayer(Layer):
         self.bias_adam_v = beta_2 * self.bias_adam_v + (1 - beta_2) * output_error**2
 
         # correct the bias that both m and v have
-        self.weights_adam_m /= 1 - beta_1**t
-        self.bias_adam_m /= 1 - beta_1**t
+        weights_adam_m_prime = self.weights_adam_m / (1 - beta_1**t)
+        bias_adam_m_prime = self.bias_adam_m / (1 - beta_1**t)
 
-        self.weights_adam_v /= 1 - beta_2**t
-        self.bias_adam_v /= 1 - beta_2**t
+        weights_adam_v_prime = self.weights_adam_v / (1 - beta_2 ** t)
+        bias_adam_v_prime = self.bias_adam_v / (1 - beta_2 ** t)
 
         # finally update the weights and bias once everything is calculated
-        self.weights -= learning_rate / np.sqrt(self.weights_adam_v + epsilon) * self.weights_adam_m
-        self.bias -= learning_rate / np.sqrt(self.bias_adam_v + epsilon) * self.bias_adam_m
+        self.weights -= learning_rate / np.sqrt(weights_adam_v_prime + epsilon) * weights_adam_m_prime
+        self.bias -= learning_rate / np.sqrt(bias_adam_v_prime + epsilon) * bias_adam_m_prime
 
         return input_error
 
