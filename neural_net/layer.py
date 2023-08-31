@@ -23,6 +23,9 @@ class Layer:
     def backwardPassAdadelta(self, output_error: np.float64, learning_rate: np.float64, gamma: np.float64 = 0.9, epsilon: np.float64 = 0.001):
         pass
 
+    def backwardPassAdam(self, output_error: np.float64, learning_rate: np.float64, epsilon: np.float64, beta_1: np.float64, beta_2: np.float64):
+        pass
+
 
 class FullyConnectedLayer(Layer):
     def __init__(self, m: int, n: int):
@@ -39,6 +42,10 @@ class FullyConnectedLayer(Layer):
         self.bias_momentum = 0
         self.weights_adadelta = 0
         self.bias_adadelta = 0
+        self.weights_adam_m = 0  # this name and the following ones are taken from the original Adam paper (m and v symbols)
+        self.bias_adam_m = 0
+        self.weights_adam_v = 0
+        self.bias_adam_v = 0
 
     def forwardPass(self, x: np.array) -> np.array:
         """
@@ -127,6 +134,40 @@ class FullyConnectedLayer(Layer):
 
         return input_error
 
+    def backwardPassAdam(self, output_error: np.float64, learning_rate: np.float64, epsilon: np.float64, beta_1: np.float64, beta_2: np.float64, t: int):
+        """
+                Computes dL/dA_l-1 given dL/dZ_l as per MIT OCW 6.036 notation
+
+                Parameters:
+                    output_error (np.float64): output error calculated by the following layer
+                    learning_rate (np.float64)
+                    gamma (np.float64): momentum constant
+
+                Returns:
+                    input_error (np.float64): output error of the previous layer
+                """
+        input_error = np.dot(output_error, self.weights.T)
+        weights_error = np.dot(self.input.T, output_error)
+
+        self.weights_adam_m = beta_1 * self.weights_adam_m + (1 - beta_1) * weights_error
+        self.bias_adam_m = beta_1 * self.bias_adam_m + (1 - beta_1) * output_error
+
+        self.weights_adam_v = beta_2 * self.weights_adam_v + (1 - beta_2) * weights_error**2
+        self.bias_adam_v = beta_2 * self.bias_adam_v + (1 - beta_2) * output_error**2
+
+        # correct the bias that both m and v have
+        self.weights_adam_m /= 1 - beta_1**t
+        self.bias_adam_m /= 1 - beta_1**t
+
+        self.weights_adam_v /= 1 - beta_2**t
+        self.bias_adam_v /= 1 - beta_2**t
+
+        # finally update the weights and bias once everything is calculated
+        self.weights -= learning_rate / np.sqrt(self.weights_adam_v + epsilon) * self.weights_adam_m
+        self.bias -= learning_rate / np.sqrt(self.bias_adam_v + epsilon) * self.bias_adam_m
+
+        return input_error
+
 
 class ActivationLayer(Layer):
     def __init__(self, activation: Callable[[Any], Any], activation_derivative: Callable[[Any], Any]):
@@ -155,4 +196,7 @@ class ActivationLayer(Layer):
         return self.backwardPass(output_error, learning_rate)
 
     def backwardPassAdadelta(self, output_error: np.float64, learning_rate: np.float64, gamma: np.float64 = 0.9, epsilon: np.float64 = 0.001):
+        return self.backwardPass(output_error, learning_rate)
+
+    def backwardPassAdam(self, output_error: np.float64, learning_rate: np.float64, epsilon: np.float64, beta_1: np.float64, beta_2: np.float64):
         return self.backwardPass(output_error, learning_rate)
