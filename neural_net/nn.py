@@ -65,7 +65,9 @@ class NeuralNetwork:
                              adaptive_step_size_method: str = '',
                              regularization_method: str = '',
                              gamma: np.float64 = 0.9,
-                             epsilon: np.float64 = 0.001):
+                             epsilon: np.float64 = 0.001,
+                             beta_1: np.float64 = 0.9,
+                             beta_2: np.float64 = 0.9):
         """
         Batch gradient descent - optimizes on the entire dataset
 
@@ -80,6 +82,8 @@ class NeuralNetwork:
             regularization_method (str): optional ()
             gamma (np.float64): optional momentum / adadelta constant, 0.9 by default
             epsilon (np.float64): optional adadelta constant, 0.001 by default
+            beta_1 (np.float64): optional adam constant (for first moment estimate as per original paper naming)
+            beta_2 (np.float64): optional adam constant (for second moment estimate as per original paper naming)
         Returns:
             None
         """
@@ -158,7 +162,9 @@ class NeuralNetwork:
                                  adaptive_step_size_method: str = '',
                                  regularization_method: str = '',
                                  gamma: np.float64 = 0.9,
-                                 epsilon: np.float64 = 0.001):
+                                 epsilon: np.float64 = 0.001,
+                                 beta_1: np.float64 = 0.9,
+                                 beta_2: np.float64 = 0.9):
         """
         Mini-batch gradient descent - optimizes on a randomly selected part of the data set per iteration
 
@@ -174,6 +180,8 @@ class NeuralNetwork:
             regularization_method (str): optional ()
             gamma (np.float64): optional momentum / adadelta constant, 0.9 by default
             epsilon (np.float64): optional adadelta constant, 0.001 by default
+            beta_1 (np.float64): optional adam constant (for first moment estimate as per original paper naming)
+            beta_2 (np.float64): optional adam constant (for second moment estimate as per original paper naming)
         Returns:
             None
         """
@@ -205,7 +213,9 @@ class NeuralNetwork:
                                   adaptive_step_size_method: str = '',
                                   regularization_method: str = '',
                                   gamma: np.float64 = 0.9,
-                                  epsilon: np.float64 = 0.001):
+                                  epsilon: np.float64 = 0.001,
+                                  beta_1: np.float64 = 0.9,
+                                  beta_2: np.float64 = 0.9):
         """
         Batch gradient descent - optimizes on only one randomly selected datapoint
 
@@ -220,6 +230,8 @@ class NeuralNetwork:
             regularization_method (str): optional ()
             gamma (np.float64): optional momentum / adadelta constant, 0.9 by default
             epsilon (np.float64): optional adadelta constant, 0.001 by default
+            beta_1 (np.float64): optional adam constant (for first moment estimate as per original paper naming)
+            beta_2 (np.float64): optional adam constant (for second moment estimate as per original paper naming)
         Returns:
             None
         """
@@ -307,7 +319,9 @@ class NeuralNetwork:
             regularization_method: str = '',
             batch_size: int = 1,
             gamma: np.float64 = 0.9,
-            epsilon: np.float64 = 0.001):
+            epsilon: np.float64 = 0.001,
+            beta_1: np.float64 = 0.9,
+            beta_2: np.float64 = 0.9):
         """
         fit the Neural Network to some training data
 
@@ -324,6 +338,8 @@ class NeuralNetwork:
             batch_size (int): batch size required for mini-batch gradient descent only
             gamma (np.float64): optional momentum / adadelta constant, 0.9 by default
             epsilon (np.float64): optional adadelta constant, 0.001 by default
+            beta_1 (np.float64): optional adam constant (for first moment estimate as per original paper naming)
+            beta_2 (np.float64): optional adam constant (for second moment estimate as per original paper naming)
         Returns:
             None
         """
