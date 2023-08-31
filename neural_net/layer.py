@@ -23,7 +23,7 @@ class Layer:
     def backwardPassAdadelta(self, output_error: np.float64, learning_rate: np.float64, gamma: np.float64 = 0.9, epsilon: np.float64 = 0.001):
         pass
 
-    def backwardPassAdam(self, output_error: np.float64, learning_rate: np.float64, epsilon: np.float64, beta_1: np.float64, beta_2: np.float64):
+    def backwardPassAdam(self, output_error: np.float64, learning_rate: np.float64, epsilon: np.float64, beta_1: np.float64, beta_2: np.float64, t: int):
         pass
 
 
@@ -198,5 +198,5 @@ class ActivationLayer(Layer):
     def backwardPassAdadelta(self, output_error: np.float64, learning_rate: np.float64, gamma: np.float64 = 0.9, epsilon: np.float64 = 0.001):
         return self.backwardPass(output_error, learning_rate)
 
-    def backwardPassAdam(self, output_error: np.float64, learning_rate: np.float64, epsilon: np.float64, beta_1: np.float64, beta_2: np.float64):
+    def backwardPassAdam(self, output_error: np.float64, learning_rate: np.float64, epsilon: np.float64, beta_1: np.float64, beta_2: np.float64, t: int):
         return self.backwardPass(output_error, learning_rate)

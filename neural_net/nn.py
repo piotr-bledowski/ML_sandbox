@@ -67,7 +67,8 @@ class NeuralNetwork:
                              gamma: np.float64 = 0.9,
                              epsilon: np.float64 = 0.001,
                              beta_1: np.float64 = 0.9,
-                             beta_2: np.float64 = 0.9):
+                             beta_2: np.float64 = 0.9,
+                             t: int = 1):
         """
         Batch gradient descent - optimizes on the entire dataset
 
@@ -84,6 +85,7 @@ class NeuralNetwork:
             epsilon (np.float64): optional adadelta constant, 0.001 by default
             beta_1 (np.float64): optional adam constant (for first moment estimate as per original paper naming)
             beta_2 (np.float64): optional adam constant (for second moment estimate as per original paper naming)
+            t (int): optional (only for Adam) epoch number - necessary information for Adam
         Returns:
             None
         """
@@ -143,7 +145,7 @@ class NeuralNetwork:
                     # Error back propagation - computing partial derivatives corresponding to each layer
                     error = self.d_loss(output, y_train[j])
                     for layer in reversed(self.layers):
-                        error = layer.backwardPassAdam(error, learning_rate, epsilon, beta_1, beta_2)
+                        error = layer.backwardPassAdam(error, learning_rate, epsilon, beta_1, beta_2, t)
 
                 epoch_errors.append(epoch_error / n_samples)
         else:
@@ -211,7 +213,7 @@ class NeuralNetwork:
             self.batchGradientDescent(X_train[indices], y_train[indices], X_valid=X_valid, y_valid=y_valid, n_epochs=1,
                                       learning_rate=learning_rate, adaptive_step_size_method=adaptive_step_size_method,
                                       regularization_method=regularization_method, gamma=gamma, epsilon=epsilon,
-                                      beta_1=beta_1, beta_2=beta_2)
+                                      beta_1=beta_1, beta_2=beta_2, t=i+1)
             epoch_errors.append(self.training_errors[0])
             print(f'Epoch {i + 1} training error: {self.training_errors[0]}')
             if X_valid is not None and y_valid is not None:
@@ -315,7 +317,7 @@ class NeuralNetwork:
                 print(f'Epoch {i + 1} training error: {epoch_errors[-1]}')
 
                 for layer in reversed(self.layers):
-                    error = layer.backwardPassAdam(error, learning_rate, epsilon, beta_1, beta_2)
+                    error = layer.backwardPassAdam(error, learning_rate, epsilon, beta_1, beta_2, t=i+1)
         else:
             # no fancy adaptive step size methods
             for i in range(n_epochs):
